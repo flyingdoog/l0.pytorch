@@ -53,9 +53,10 @@ class L0Net(nn.Module):
         mask1 = mask1.cpu().detach().numpy()
         logalpha[logalpha<0]=0
         test  = np.sum(logalpha)
-
+        all = logalpha.shape[0]*logalpha.shape[1]
+        mask1[mask1>0]=1
         mask_sum = np.sum(mask1)
-        print('dense 1 log alpha',test, 'z', mask_sum)
+        print('dense 1 log alpha',test, 'z', mask_sum, 'ratio=', 1.0*mask_sum/all)
         x = F.relu(x)
         x, z4,_ = self.dense2(x)
         penalty = z1 + z2 + z3 + z4
