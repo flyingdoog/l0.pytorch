@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-
+import numpy as np
 import tensorboardX
 
 from trainer import Trainer
@@ -48,8 +48,13 @@ class L0Net(nn.Module):
         x = F.max_pool2d(x, 2, stride=2)
         x = x.view(x.shape[0], -1)
         x, z3, mask1= self.dense1(x)
-        test  = torch.sum(self.dense1.loc).item()
-        mask_sum = torch.sum(mask1).item()
+
+        logalpha = self.dense1.loc.cpu().detach().numpy()
+        mask1 = mask1.cpu().detach().numpy()
+        logalpha[logalpha<0]=0
+        test  = np.sum(logalpha)
+
+        mask_sum = np.sum(mask1)
         print('dense 1 log alpha',test, 'z', mask_sum)
         x = F.relu(x)
         x, z4,_ = self.dense2(x)
