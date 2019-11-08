@@ -53,7 +53,7 @@ class L0Linear(_L0Norm):
 
     def forward(self, input):
         mask, penalty = self._get_mask()
-        return F.linear(input, self._origin.weight * mask, self._origin.bias), penalty
+        return F.linear(input, self._origin.weight * mask, self._origin.bias), penalty, mask
 
 
 class L0Conv2d(_L0Norm):

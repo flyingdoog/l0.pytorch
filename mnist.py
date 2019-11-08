@@ -47,9 +47,12 @@ class L0Net(nn.Module):
         x, z2 = self.conv2(x)
         x = F.max_pool2d(x, 2, stride=2)
         x = x.view(x.shape[0], -1)
-        x, z3 = self.dense1(x)
+        x, z3, mask1= self.dense1(x)
+        test  = torch.sum(self.dense1.loc).item()
+        mask_sum = torch.sum(mask1).item()
+        print('dense 1 log alpha',test, 'z', mask_sum)
         x = F.relu(x)
-        x, z4 = self.dense2(x)
+        x, z4,_ = self.dense2(x)
         penalty = z1 + z2 + z3 + z4
         return x, penalty
 
@@ -90,7 +93,7 @@ def main(epochs, batch_size, coef, mean, baseline):
     loss_f = F.cross_entropy if baseline else l0_loss
     trainer = Trainer(model, optimizer, loss_f, logger)
     if not baseline:
-        correct = lambda output, target: (output[0].max(dim=1)[1] == target).sum().data[0]
+        correct = lambda output, target: (output[0].max(dim=1)[1] == target).sum().data
         trainer.correct = correct
 
     trainer.start(epochs, train_loader, test_loader)
@@ -101,9 +104,9 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--epochs", type=int, default=200)
-    parser.add_argument("--coef", type=float, default=1e-1)
-    parser.add_argument("--mean", type=float, default=1)
+    parser.add_argument("--epochs", type=int, default=2000)
+    parser.add_argument("--coef", type=float, default=0.1)
+    parser.add_argument("--mean", type=float, default=0.5)
     parser.add_argument("--baseline", action="store_true")
 
     main(**vars(parser.parse_args()))

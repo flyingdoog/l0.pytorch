@@ -50,7 +50,7 @@ class Trainer(object):
         if is_train:
             loss.backward()
             self._optimizer.step()
-        loss = loss.data[0]
+        loss = loss.data
         correct = self.correct(output, target)
         return loss, correct
 
